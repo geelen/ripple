@@ -1,5 +1,5 @@
 <template>
-  <div v-on-click-outside="onClickOutside" class="rpl-checklist wrapper">
+  <div class="rpl-checklist wrapper">
     <!-- List Box -->
     <div v-if="schema.listBox" class="rpl-checklist__combobox form-control" :disabled="disabled">
       <div class="rpl-checklist__list">
@@ -17,8 +17,8 @@
     </div>
     <!-- Combo Box -->
     <div v-if="!schema.listBox" class="rpl-checklist__combobox form-control" :class="{ 'rpl-checklist__combobox--expanded': comboExpanded }" :disabled="disabled">
-      <div class="rpl-checklist__main-row" @click="onExpandCombo" :class="{ expanded: comboExpanded }">
-        <button :aria-expanded="comboExpanded" class="rpl-checklist__info" type="button">
+      <div class="rpl-checklist__main-row" :class="{ expanded: comboExpanded }">
+        <button :aria-expanded="comboExpanded" class="rpl-checklist__info" type="button" @click="onExpandCombo()">
           <span>{{ labelText }}<span class="rpl-checklist__more-count" v-if="labelHiddenCount"> + {{ labelHiddenCount }} more</span></span>
           <rpl-icon symbol="down" color="primary" />
         </button>
@@ -44,10 +44,9 @@ import RplIcon from '@dpc-sdp/ripple-icon'
 import RplCheckbox from '../Checkbox.vue'
 import { isObject } from 'lodash'
 import { abstractField, schema } from 'vue-form-generator'
-import { mixin as onClickOutside } from 'vue-on-click-outside'
 
 export default {
-  mixins: [abstractField, onClickOutside],
+  mixins: [abstractField],
   components: {
     RplIcon,
     RplCheckbox
@@ -137,9 +136,12 @@ export default {
     },
     onExpandCombo () {
       this.comboExpanded = !this.comboExpanded
-    },
-    onClickOutside (event) {
-      this.comboExpanded = false
+
+      if (this.comboExpanded) {
+        this.addOutsideTest()
+      } else {
+        this.removeOutsideTest()
+      }
     },
     updateSize () {
       let str = this.schema.placeholder
@@ -175,6 +177,24 @@ export default {
     setCheckedValues () {
       // Set initial values for checkboxes
       this.listValues = this.items.map(item => this.isItemChecked(item))
+    },
+    addOutsideTest () {
+      if (typeof window !== 'undefined') {
+        document.addEventListener('click', this.testOutside)
+      }
+    },
+    testOutside (event) {
+      if (typeof window !== 'undefined') {
+        if (!this.$el.contains(event.target)) {
+          this.comboExpanded = false
+          this.removeOutsideTest()
+        }
+      }
+    },
+    removeOutsideTest (event) {
+      if (typeof window !== 'undefined') {
+        document.removeEventListener('click', this.testOutside)
+      }
     }
   },
   beforeDestroy: function () {
