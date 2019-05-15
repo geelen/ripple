@@ -10,6 +10,7 @@
     "test": "NODE_ENV=test jest",
     "storybook": "start-storybook -p 3000 -c .storybook -s ./static",
     "build-storybook": "NODE_ENV=production build-storybook -c .storybook -s ./static -o ./public",
+    "build:fab": "npm run build-storybook && fab-static static",
     "start": "npm run storybook",
     "bay:start": "docker-compose up -d",
     "bay:rebuild-full": "docker-compose up -d --build --force-recreate",
@@ -68,6 +69,7 @@
     "@dpc-sdp/ripple-timeline": "file:packages/Molecules/Timeline",
     "@dpc-sdp/ripple-updated-date": "file:packages/Organisms/UpdatedDate",
     "@dpc-sdp/ripple-whats-next": "file:packages/Molecules/WhatsNext",
+    "@fab/static": "^0.1.4",
     "vue": "^2.5.16"
   },
   "devDependencies": {
